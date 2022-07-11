@@ -51,12 +51,15 @@ fakeIdsArray = np.array(fakeIds)
 multipleRedIdsOutOfOrderArray = np.array(multipleRedIdsOutOfOrder)
 
 # make empty list for each color
+global red
+global current_id
 red = []
 green = []
 blue = []
 dark = []
 light = []
 blank = []
+current_id = 0
 
 filePath = "C:/Users/Patrick/Desktop/Coding/PaDBox/resources/PaDTextures/portraits/"
 
@@ -97,31 +100,82 @@ getColor("1")
 # print(idFile.readline())
 
 
+# this is where things get a bit wonky
+# current_id has to be a global variable that is changed so it can be used by the add functions
+# refer to comment section before addId
 def separateIds(allIds):
     for i in range(len(allIds)):
         print("id:", allIds[i])
-        addId(allIds[i], getColor(allIds[i]))
+        global current_id
+        current_id = allIds[i]
+        print("current id in separate", current_id)
+        addId(getColor(allIds[i]))
+
+# I cant use this return match style to call red.append(id) for example
+# python doesn't work this way.
+# it would call the functions and the returned value from those functions as assigned to that key of the dictionary
+# so instead I have to call individual add functions, and have it use current_id
+# if i called the individual functions passing id. 
+#  it would be the same problem as if I just did red.append(id)
+# not a fan of this system but without doing a different type of switch statement or case match
+# i do not believe it is possible. I'm on Python 3.8.xx so I am missing some features
 
 
-def addId(id, color):
+def addId(color):
+    print("add id with current id", current_id, "and color", color)
     return {
-        "red": red.append(id),
-        "blue": blue.append(id),
-        "green": green.append(id),
-        "light": light.append(id),
-        "dark": dark.append(id),
-        "blank": blank.append(id)  # No Main Attribute
+        "red": addRed(),
+        "blue": addBlue,
+        "green": addGreen,
+        "light": addLight,
+        "dark": addDark,
+        "blank": addBlank  # No Main Attribute
     }.get(color, "Error: no color match")  # Gotta figure out some error handling type stuff
+#okay forget everything
+#this above thing will not work
+#it still jsut executes addRed for every id for the same reason i think
+#going to have to figure out a different type of switch case way in python.
+#going to push for the sake of history
+
+def addRed():
+    global red
+    print("calling add red with current id", current_id)
+    red.append(current_id)
+
+
+def addBlue():
+    blue.append(current_id)
+
+
+def addGreen():
+    green.append(current_id),
+
+
+def addLight():
+    light.append(current_id),
+
+
+def addDark():
+    dark.append(current_id)
+
+
+def addBlank():
+    blank.append(current_id)
+
 
 import csv
 
-with open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt") as csvfile:
-    csvReader = csv.reader(csvfile, delimiter=',')
-    for row in csvReader:
-        print("row", row)
-        print(type(row))
-        print(len(row))
-        separateIds(row)
+#with open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt") as csvfile:
+   # csvReader = csv.reader(csvfile, delimiter=',')
+#    for row in csvReader:
+ #       print("row", row)
+#        print(type(row))
+ #       print(len(row))
+     #   #separateIds(row)
+        
+# uncomment later^
+
+
         # premake for lists/arrays/whatever they are that are used to do collages
         # one for each color
         # loop through each id in row
