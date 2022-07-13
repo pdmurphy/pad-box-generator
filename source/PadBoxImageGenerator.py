@@ -123,14 +123,17 @@ def separateIds(allIds):
 
 def addId(color):
     print("add id with current id", current_id, "and color", color)
-    return {
-        "red": addRed(),
+    switcher = {
+        "red": addRed,
         "blue": addBlue,
         "green": addGreen,
         "light": addLight,
         "dark": addDark,
         "blank": addBlank  # No Main Attribute
-    }.get(color, "Error: no color match")  # Gotta figure out some error handling type stuff
+    }
+    func = switcher.get(color, 'Invalid color')
+    return func()  
+# Gotta figure out some error handling type stuff
 #okay forget everything
 #this above thing will not work
 #it still jsut executes addRed for every id for the same reason i think
@@ -138,8 +141,6 @@ def addId(color):
 #going to push for the sake of history
 
 def addRed():
-    global red
-    print("calling add red with current id", current_id)
     red.append(current_id)
 
 
