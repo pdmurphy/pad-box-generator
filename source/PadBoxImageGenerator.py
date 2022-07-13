@@ -1,57 +1,8 @@
-#using list of IDs 
-#open each image and categorize into 6 (5+colorless) separate array lists based on color
-
-#combine the 6 arrays back into 1 list of IDs that will now be organized by color
-#returning that combined/organized list
-
-#run image generator that takes list of IDs and creates combined image of them all
-
-
-
-#one issue is that ending segments of each color
-#their arrayys will need an "empty" or somethjing to fill so that the empty slots are accounted for
-#cause i think otherwise it wont combine correctly at the end vertically from what I tested.
-
-
-#function example
-# def get_portraits_img(file_name):
-#     if file_name not in card_imgs:
-#         file_path = os.path.join(args.input_dir, file_name)
-#         if not os.path.exists(file_path):
-#             return None
-#         card_imgs[file_name] = Image.open(file_path)
-#     return card_imgs[file_name]
-
-#to split between multiple files. 
-#ypu just import myfile
-#file myfile example
-#def get_user_age():
-#   return int(input("Enter your age: "))
-#file main example
-#import myfile
-# try:
-#     myfile.get_user_age()
-# except ValueError:
-#     print("That's not a valid value for your age!")
-
-
 from PIL import Image
 import numpy as np
 
-# three test cases. 1 of each color
-# one with wrong id names
-# one with two reds (for organizing)
-realIds = [1, 5, 9, 13, 17, 7434]
-fakeIds = [1.1, 2.2]
-multipleRedIdsOutOfOrder = [1, 5, 9, 13, 17, 7434, 36]  # 36 is the second red
-
-# convert Into np array
-realIdsArray = np.array(realIds)
-fakeIdsArray = np.array(fakeIds)
-multipleRedIdsOutOfOrderArray = np.array(multipleRedIdsOutOfOrder)
-
 # make empty list for each color
-global red
+# also current id to use in separateIds
 global current_id
 red = []
 green = []
@@ -92,14 +43,6 @@ def colorHelper(RGBValue):
         (255, 255, 255, 255): "blank"  # No Main Attribute
     }.get(RGBValue, "???")
 
-
-print("run getColor 1")
-getColor("1")
-
-# idFile = open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsList.txt")
-# print(idFile.readline())
-
-
 # this is where things get a bit wonky
 # current_id has to be a global variable that is changed so it can be used by the add functions
 # refer to comment section before addId
@@ -111,14 +54,14 @@ def separateIds(allIds):
         print("current id in separate", current_id)
         addId(getColor(allIds[i]))
 
-# I cant use this return match style to call red.append(id) for example
+# I cant use the same return match style as getColor to call red.append(id) for example
 # python doesn't work this way.
 # it would call the functions and the returned value from those functions as assigned to that key of the dictionary
 # so instead I have to call individual add functions, and have it use current_id
 # if i called the individual functions passing id. 
 #  it would be the same problem as if I just did red.append(id)
 # not a fan of this system but without doing a different type of switch statement or case match
-# i do not believe it is possible. I'm on Python 3.8.xx so I am missing some features
+# i do not believe it is possible. 
 
 
 def addId(color):
@@ -132,13 +75,64 @@ def addId(color):
         "blank": addBlank  # No Main Attribute
     }
     func = switcher.get(color, 'Invalid color')
-    return func()  
+    return func()
 # Gotta figure out some error handling type stuff
-#okay forget everything
-#this above thing will not work
-#it still jsut executes addRed for every id for the same reason i think
-#going to have to figure out a different type of switch case way in python.
-#going to push for the sake of history
+
+
+def generateBoxRow(index, portraitsPerRow, colorArray):
+    # 100,100,4 are the dimensions for a portrait in terms of np
+    # you need the dimensions of empty spot to match the normal portrait dimensions otherwise it errors
+    # figured out these dimensions via little test like imageData.shape or .ndim
+    row = np.zeros((100, 100, 4), np.uint8)
+    i = 0
+    while i < portraitsPerRow:  # loop for amount of portraits per row
+        # need to use passed index so the id we grab for colorArray is correct
+        if index < len(colorArray):
+            id = colorArray[index]
+            idPath = filePath + id + ".png"
+            image = Image.open(idPath)
+            imageData = np.asarray(image)
+            if i == 0:
+                # if first image in row, you just add it by itself
+                row = np.hstack([imageData])
+            else:
+                row = np.hstack([row, imageData])
+        else:
+            row = np.hstack([row, np.zeros((100, 100, 4), np.uint8)])
+        i = i + 1
+        index = index + 1
+    return (row, index)
+
+
+def generateBoxCollage(portraitsPerRow):
+    allColors = [red, blue, green, light, dark, blank]
+    #start with empty collage
+    collage = np.zeros((100, 100, 4), np.uint8)
+    for colorArray in allColors:
+        index = 0
+        while index < len(colorArray):
+            row, updatedIndex = generateBoxRow(index, portraitsPerRow, colorArray)
+            if colorArray == red and index == 0:
+                collage = np.vstack([row])
+            else:
+                collage = np.vstack([collage, row])
+            index = updatedIndex
+            # update index to the number given from generateBoxRow
+
+    finalImage = Image.fromarray(collage)
+    finalImage.save("PaDBox.png")
+
+
+# if id = 0 
+
+# do the full run with fake ids first of course
+# image = Image.open(r"C:\Users\Patrick\Pictures\2na71g3.jpg")
+# data = np.asarray(image)
+# collage = np.vstack([data, data])
+# data2 = np.vstack([data, np.zeros((124, 124, 3), np.uint8)])
+# collage = np.hstack([collage, data2])
+# append to add to a list (normal python list, not np array)
+
 
 def addRed():
     red.append(current_id)
@@ -164,6 +158,14 @@ def addBlank():
     blank.append(current_id)
 
 
+def clearIds():
+    red.clear()
+    blue.clear()
+    green.clear()
+    light.clear()
+    dark.clear()
+    blank.clear()
+
 import csv
 
 #with open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt") as csvfile:
@@ -175,6 +177,7 @@ import csv
      #   #separateIds(row)
         
 # uncomment later^
+
 
 
         # premake for lists/arrays/whatever they are that are used to do collages
@@ -189,12 +192,4 @@ import csv
         # then run collaging thing that combines all of them
         # i like the doing id list for each better
         # but it is almost assurdely less performant.
-
-# do the full run with fake ids first of course
-
-# data = np.asarray(image)
-# collage = np.vstack([data, data])
-# data2 = np.vstack([data, np.zeros((124, 124, 3), np.uint8)])
-# collage = np.hstack([collage, data2])
-#append to add to a list (normal python list, not np array)
 
