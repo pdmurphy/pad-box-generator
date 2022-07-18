@@ -1,5 +1,45 @@
 from PIL import Image
 import numpy as np
+import argparse
+import csv
+
+parser = argparse.ArgumentParser(description="Generates P&D image collage from a list of Ids.", add_help=False)
+
+inputGroup = parser.add_argument_group("Input")
+inputGroup.add_argument("--id_file", required=True, help="Path to text file of id numbers separated by comma")
+inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
+inputGroup.add_argument("--imgs_per_row", const=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
+inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
+
+
+# outputGroup = parser.add_argument_group("Output")
+# outputGroup.add_argument("--output_dir", help="Path to a folder where output should be saved")
+helpGroup = parser.add_argument_group("Help")
+helpGroup.add_argument("-h", "--help", action="help", help="Displays this help message and exits.")
+args = parser.parse_args()
+
+#card_templates_file = args.imgs_per_row
+#output_dir = args.output_dir
+
+
+def testIds():
+    #reads file and calls separate Ids
+    readIdFile(args.id_file)
+
+def readIdFile(filePath):
+    with open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt") as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',')
+        #print("csvreader len", len(csvReader))
+        rowcount = 0
+        for row in csvReader:
+            if(rowcount>=1):
+                print("Your ID file is incorrect. Multiple rows")
+                exit()
+                # not robust and could be worked around but don't want to deal with it as I don't need it
+            else:
+                separateIds(row)
+                rowcount += 1
+
 
 # make empty list for each color
 # also current id to use in separateIds
@@ -76,7 +116,7 @@ def addId(color):
     }
     func = switcher.get(color, 'Invalid color')
     return func()
-# Gotta figure out some error handling type stuff
+# Currently no real error handling 
 
 
 def generateBoxRow(index, portraitsPerRow, colorArray):
@@ -123,17 +163,6 @@ def generateBoxCollage(portraitsPerRow):
     finalImage.save("PaDBox.png")
 
 
-# if id = 0 
-
-# do the full run with fake ids first of course
-# image = Image.open(r"C:\Users\Patrick\Pictures\2na71g3.jpg")
-# data = np.asarray(image)
-# collage = np.vstack([data, data])
-# data2 = np.vstack([data, np.zeros((124, 124, 3), np.uint8)])
-# collage = np.hstack([collage, data2])
-# append to add to a list (normal python list, not np array)
-
-
 def addRed():
     red.append(current_id)
 
@@ -166,30 +195,8 @@ def clearIds():
     dark.clear()
     blank.clear()
 
-import csv
-
-#with open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt") as csvfile:
-   # csvReader = csv.reader(csvfile, delimiter=',')
-#    for row in csvReader:
- #       print("row", row)
-#        print(type(row))
- #       print(len(row))
-     #   #separateIds(row)
-        
-# uncomment later^
-
-
-
-        # premake for lists/arrays/whatever they are that are used to do collages
-        # one for each color
-        # loop through each id in row
-        # for each id. run the color getter.
-        # here is where im unsure
-        # either
-        # do the arary conversion thing for the image and add it to the correct color array
-        # or just do list of ids for each color first
-        # then run thing that does the collage-ing for each color array
-        # then run collaging thing that combines all of them
-        # i like the doing id list for each better
-        # but it is almost assurdely less performant.
-
+if(args.id_test):
+    testIds()
+else:
+    readIdFile(filePath)
+    generateBoxCollage(args.imgs_per_row)        
