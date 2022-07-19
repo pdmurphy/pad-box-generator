@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description="Generates P&D image collage from a
 inputGroup = parser.add_argument_group("Input")
 inputGroup.add_argument("--id_file", required=True, help="Path to text file of id numbers separated by comma")
 inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
-inputGroup.add_argument("--imgs_per_row", const=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
+inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
 inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
 
 
@@ -21,13 +21,25 @@ args = parser.parse_args()
 #card_templates_file = args.imgs_per_row
 #output_dir = args.output_dir
 
+# make empty list for each color
+# also current id to use in separateIds
+global current_id
+red = []
+green = []
+blue = []
+dark = []
+light = []
+blank = []
+current_id = 0
+portraitsPath = args.portraits_dir
 
 def testIds():
     #reads file and calls separate Ids
     readIdFile(args.id_file)
 
-def readIdFile(filePath):
-    with open("C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt") as csvfile:
+def readIdFile(idfilePath):
+    # C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt
+    with open(idfilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
         #print("csvreader len", len(csvReader))
         rowcount = 0
@@ -41,18 +53,7 @@ def readIdFile(filePath):
                 rowcount += 1
 
 
-# make empty list for each color
-# also current id to use in separateIds
-global current_id
-red = []
-green = []
-blue = []
-dark = []
-light = []
-blank = []
-current_id = 0
-
-filePath = "C:/Users/Patrick/Desktop/Coding/PaDBox/resources/PaDTextures/portraits/"
+# myFilePath = "C:/Users/Patrick/Desktop/Coding/PaDBox/resources/PaDTextures/portraits/"
 
 # Pixel location to check
 # x:26, y:3 this is a spot on the border
@@ -64,7 +65,7 @@ filePath = "C:/Users/Patrick/Desktop/Coding/PaDBox/resources/PaDTextures/portrai
 # empty/noMain attribute (255, 255, 255, 255)
 
 
-def getColor(fileName):
+def getColor(filePath, fileName):
     combinedPath = filePath + fileName + ".png"
     image = Image.open(combinedPath)
     color = image.getpixel((26, 3))
@@ -92,7 +93,7 @@ def separateIds(allIds):
         global current_id
         current_id = allIds[i]
         print("current id in separate", current_id)
-        addId(getColor(allIds[i]))
+        addId(getColor(portraitsPath, allIds[i]))
 
 # I cant use the same return match style as getColor to call red.append(id) for example
 # python doesn't work this way.
@@ -129,7 +130,7 @@ def generateBoxRow(index, portraitsPerRow, colorArray):
         # need to use passed index so the id we grab for colorArray is correct
         if index < len(colorArray):
             id = colorArray[index]
-            idPath = filePath + id + ".png"
+            idPath = portraitsPath + id + ".png"
             image = Image.open(idPath)
             imageData = np.asarray(image)
             if i == 0:
@@ -198,5 +199,5 @@ def clearIds():
 if(args.id_test):
     testIds()
 else:
-    readIdFile(filePath)
+    readIdFile(args.id_file)
     generateBoxCollage(args.imgs_per_row)        
