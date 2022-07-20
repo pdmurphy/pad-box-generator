@@ -10,7 +10,7 @@ inputGroup.add_argument("--id_file", required=True, help="Path to text file of i
 inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
 inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
 inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
-
+inputGroup.add_argument("--no_ordering", action="store_true", help="Preserves order of ids for each color. Still color separated")
 
 # outputGroup = parser.add_argument_group("Output")
 # outputGroup.add_argument("--output_dir", help="Path to a folder where output should be saved")
@@ -146,7 +146,13 @@ def generateBoxRow(index, portraitsPerRow, colorArray):
 
 
 def generateBoxCollage(portraitsPerRow):
-    allColors = [red, blue, green, light, dark, blank]
+    allColors = None
+    # figure out if preserving order or if sorting
+    if (args.no_ordering):
+        allColors = [red, blue, green, light, dark, blank]
+    else:
+        sortColors()
+        allColors = [red, blue, green, light, dark, blank]
     #start with empty collage
     collage = np.zeros((100, 100, 4), np.uint8)
     for colorArray in allColors:
@@ -187,6 +193,13 @@ def addDark():
 def addBlank():
     blank.append(current_id)
 
+def sortColors():
+    red.sort()
+    blue.sort()
+    green.sort()
+    light.sort()
+    dark.sort()
+    blank.sort()
 
 def clearIds():
     red.clear()
