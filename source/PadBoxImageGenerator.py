@@ -3,6 +3,8 @@ import numpy as np
 import argparse
 import csv
 
+# Main function calls at bottom.
+
 parser = argparse.ArgumentParser(description="Generates P&D image collage from a list of Ids.", add_help=False)
 
 inputGroup = parser.add_argument_group("Input")
@@ -12,14 +14,10 @@ inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=in
 inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
 inputGroup.add_argument("--no_ordering", action="store_true", help="Preserves order of ids for each color. Still color separated")
 
-# outputGroup = parser.add_argument_group("Output")
-# outputGroup.add_argument("--output_dir", help="Path to a folder where output should be saved")
 helpGroup = parser.add_argument_group("Help")
 helpGroup.add_argument("-h", "--help", action="help", help="Displays this help message and exits.")
 args = parser.parse_args()
 
-#card_templates_file = args.imgs_per_row
-#output_dir = args.output_dir
 
 # make empty list for each color and subattribute per color
 # also current id to use in separateIds
@@ -30,13 +28,7 @@ redBlue = []
 redGreen = []
 redLight = []
 redDark = []
-
-green = []
-greenRed = []
-greenBlue = []
-greenGreen = []
-greenLight = []
-greenDark = []
+redBlank = []
 
 blue = []
 blueRed = []
@@ -44,13 +36,15 @@ blueBlue = []
 blueGreen = []
 blueLight = []
 blueDark = []
+blueBlank = []
 
-dark = []
-darkRed = []
-darkBlue = []
-darkGreen = []
-darkLight = []
-darkDark = []
+green = []
+greenRed = []
+greenBlue = []
+greenGreen = []
+greenLight = []
+greenDark = []
+greenBlank = []
 
 light = []
 lightRed = []
@@ -58,22 +52,38 @@ lightBlue = []
 lightGreen = []
 lightLight = []
 lightDark = []
+lightBlank = []
+
+dark = []
+darkRed = []
+darkBlue = []
+darkGreen = []
+darkLight = []
+darkDark = []
+darkBlank = []
 
 blank = []
+blankRed = []
+blankBlue = []
+blankGreen = []
+blankLight = []
+blankDark = []
 
 current_id = 0
 portraitsPath = args.portraits_dir
 
+
 def testIds():
-    #reads file and calls separate Ids
+    # reads file and calls separate Ids
     readIdFile(args.id_file)
+
 
 def readIdFile(idfilePath):
     with open(idfilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
         rowcount = 0
         for row in csvReader:
-            if(rowcount>=1):
+            if(rowcount >= 1):
                 print("Your ID file is incorrect. Multiple rows")
                 exit()
                 # not robust and could be worked around but don't want to deal with it as I don't need it
@@ -92,11 +102,11 @@ def readIdFile(idfilePath):
 # empty/noMain attribute (255, 255, 255, 255)
 
 
-def getColor(filePath, fileName): # 85,85
+def getColor(filePath, fileName):
     combinedPath = filePath + fileName + ".png"
     image = Image.open(combinedPath)
     color = image.getpixel((26, 3))
-    subColor = image.getpixel((85,85))
+    subColor = image.getpixel((85, 85))
     return (colorHelper(color), colorSubAttHelper(subColor))
 
 
@@ -114,11 +124,11 @@ def colorHelper(RGBValue):
 def colorSubAttHelper(RGBValue):
     return {
         (255, 119, 51, 255): "red",
-        (42, 128, 172, 255): "blue",
-        (76, 229, 64, 255): "green",
-        (255, 242, 72, 255): "light",
-        (121, 68, 145, 255): "dark",
-    }.get(RGBValue, "No SubAtt")
+        (34, 68, 102, 255): "blue",
+        (85, 255, 68, 255): "green",
+        (255, 238, 68, 255): "light",
+        (68, 34, 102, 255): "dark",
+    }.get(RGBValue, "blank")
 
 
 # this is where things get a bit wonky
@@ -126,10 +136,10 @@ def colorSubAttHelper(RGBValue):
 # refer to comment section before addId
 def separateIds(allIds):
     for i in range(len(allIds)):
-        print("id:", allIds[i])
+        # print("id:", allIds[i])
         global current_id
         current_id = allIds[i]
-        print("current id in separate", current_id)
+        # print("current id in separate", current_id)
         addId(getColor(portraitsPath, allIds[i]))
 
 # I cant use the same return match style as getColor to call red.append(id) for example
@@ -142,17 +152,53 @@ def separateIds(allIds):
 # i do not believe it is possible. 
 
 
-def addId(color):
-    print("add id with current id", current_id, "and color", color)
+def addId(colors):
+    #  print("add id with current id", current_id, "and color", color
+    print("current id", current_id, "colors tuple before switcher", colors)
+
     switcher = {
-        "red": addRed,
-        "blue": addBlue,
-        "green": addGreen,
-        "light": addLight,
-        "dark": addDark,
-        "blank": addBlank  # No Main Attribute
+        ("red", "red"): addRedRed,
+        ("red", "blue"): addRedBlue,
+        ("red", "green"): addRedGreen,
+        ("red", "light"): addRedLight,
+        ("red", "dark"): addRedDark,
+        ("red", "blank"): addRed,
+
+        ("blue", "red"): addBlueRed,
+        ("blue", "blue"): addBlueBlue,
+        ("blue", "green"): addBlueGreen,
+        ("blue", "light"): addBlueLight,
+        ("blue", "dark"): addBlueDark,
+        ("blue", "blank"): addBlue,
+
+        ("green", "red"): addGreenRed,
+        ("green", "blue"): addGreenBlue,
+        ("green", "green"): addGreenGreen,
+        ("green", "light"): addGreenLight,
+        ("green", "dark"): addGreenDark,
+        ("green", "blank"): addGreen,
+
+        ("light", "red"): addLightRed,
+        ("light", "blue"): addLightBlue,
+        ("light", "green"): addLightGreen,
+        ("light", "light"): addLightLight,
+        ("light", "dark"): addLightDark,
+        ("light", "blank"): addLight,
+
+        ("dark", "red"): addDarkRed,
+        ("dark", "blue"): addDarkBlue,
+        ("dark", "green"): addDarkGreen,
+        ("dark", "light"): addDarkLight,
+        ("dark", "dark"): addDarkDark,
+        ("dark", "blank"): addDark,
+        # No Main Attribute
+        ("blank", "red"): addBlankRed,
+        ("blank", "blue"): addBlankBlue,
+        ("blank", "green"): addBlankGreen,
+        ("blank", "light"): addBlankLight,
+        ("blank", "dark"): addBlankDark
     }
-    func = switcher.get(color, 'Invalid color')
+    func = switcher.get(colors, 'Invalid colors')
     return func()
 # Currently no real error handling 
 
@@ -186,9 +232,11 @@ def generateBoxCollage(portraitsPerRow):
     allColors = None
     # figure out if preserving order or if sorting
     if (args.no_ordering):
+        mergeColors()
         allColors = [red, blue, green, light, dark, blank]
     else:
         sortColors()
+        mergeColors()
         allColors = [red, blue, green, light, dark, blank]
     #start with empty collage
     collage = np.zeros((100, 100, 4), np.uint8)
@@ -208,35 +256,271 @@ def generateBoxCollage(portraitsPerRow):
 
 
 def addRed():
-    red.append(current_id)
+    redBlank.append(current_id)
+
+
+def addRedRed():
+    redRed.append(current_id)
+
+
+def addRedBlue():
+    redBlue.append(current_id)
+
+
+def addRedGreen():
+    redGreen.append(current_id)
+
+
+def addRedLight():
+    redLight.append(current_id)
+
+
+def addRedDark():
+    redDark.append(current_id)
 
 
 def addBlue():
-    blue.append(current_id)
+    blueBlank.append(current_id)
+
+
+def addBlueRed():
+    blueRed.append(current_id)
+
+
+def addBlueBlue():
+    blueBlue.append(current_id)
+
+
+def addBlueGreen():
+    blueGreen.append(current_id)
+
+
+def addBlueLight():
+    blueLight.append(current_id)
+
+
+def addBlueDark():
+    blueDark.append(current_id)
 
 
 def addGreen():
-    green.append(current_id),
+    greenBlank.append(current_id),
+
+
+def addGreenRed():
+    greenRed.append(current_id),
+
+
+def addGreenBlue():
+    greenBlue.append(current_id),
+
+
+def addGreenGreen():
+    greenGreen.append(current_id),
+
+
+def addGreenLight():
+    greenLight.append(current_id),
+
+
+def addGreenDark():
+    greenDark.append(current_id),
 
 
 def addLight():
-    light.append(current_id),
+    lightBlank.append(current_id),
+
+
+def addLightRed():
+    lightRed.append(current_id),
+
+
+def addLightBlue():
+    lightBlue.append(current_id),
+
+
+def addLightGreen():
+    lightGreen.append(current_id),
+
+
+def addLightLight():
+    lightLight.append(current_id),
+
+
+def addLightDark():
+    lightDark.append(current_id),
 
 
 def addDark():
-    dark.append(current_id)
+    darkBlank.append(current_id)
+
+
+def addDarkRed():
+    darkRed.append(current_id)
+
+
+def addDarkBlue():
+    darkBlue.append(current_id)
+
+
+def addDarkGreen():
+    darkGreen.append(current_id)
+
+
+def addDarkLight():
+    darkLight.append(current_id)
+
+
+def addDarkDark():
+    darkDark.append(current_id)
 
 
 def addBlank():
     blank.append(current_id)
 
+
+def addBlankRed():
+    blankRed.append(current_id)
+
+
+def addBlankBlue():
+    blankBlue.append(current_id)
+
+
+def addBlankGreen():
+    blankGreen.append(current_id)
+
+
+def addBlankLight():
+    blankLight.append(current_id)
+
+
+def addBlankDark():
+    blankDark.append(current_id)
+
+
 def sortColors():
-    red.sort()
-    blue.sort()
-    green.sort()
-    light.sort()
-    dark.sort()
-    blank.sort()
+    sortReds()
+    sortBlues()
+    sortGreens()
+    sortLights()
+    sortDarks()
+    sortBlanks()
+
+
+def mergeColors():
+    mergeReds()
+    mergeBlues()
+    mergeGreens()
+    mergeLights()
+    mergeDarks()
+    mergeBlanks()
+
+
+def sortReds():
+    redRed.sort()
+    redBlue.sort()
+    redGreen.sort()
+    redLight.sort()
+    redDark.sort()
+    redBlank.sort()
+
+
+def sortBlues():
+    blueRed.sort()
+    blueBlue.sort()
+    blueGreen.sort()
+    blueLight.sort()
+    blueDark.sort()
+    blueBlank.sort()
+
+
+def sortGreens():
+    greenRed.sort()
+    greenBlue.sort()
+    greenGreen.sort()
+    greenLight.sort()
+    greenDark.sort()
+    greenBlank.sort()
+
+
+def sortLights():
+    lightRed.sort()
+    lightBlue.sort()
+    lightGreen.sort()
+    lightLight.sort()
+    lightDark.sort()
+    lightBlank.sort()
+
+
+def sortDarks():
+    darkRed.sort()
+    darkBlue.sort()
+    darkGreen.sort()
+    darkLight.sort()
+    darkDark.sort()
+    darkBlank.sort()
+
+
+def sortBlanks():
+    blankRed.sort()
+    blankBlue.sort()
+    blankGreen.sort()
+    blankLight.sort()
+    blankDark.sort()
+
+def mergeReds():
+    red.extend(redRed)
+    red.extend(redBlue)
+    red.extend(redGreen)
+    red.extend(redLight)
+    red.extend(redDark)
+    red.extend(redBlank)
+
+
+def mergeBlues():
+    blue.extend(blueRed)
+    blue.extend(blueBlue)
+    blue.extend(blueGreen)
+    blue.extend(blueLight)
+    blue.extend(blueDark)
+    blue.extend(blueBlank)
+
+
+def mergeGreens():
+    green.extend(greenRed)
+    green.extend(greenBlue)
+    green.extend(greenGreen)
+    green.extend(greenLight)
+    green.extend(greenDark)
+    green.extend(greenBlank)
+
+
+def mergeLights():
+    light.extend(lightRed)
+    light.extend(lightBlue)
+    light.extend(lightGreen)
+    light.extend(lightLight)
+    light.extend(lightDark)
+    light.extend(lightBlank)
+
+
+def mergeDarks():
+    dark.extend(darkRed)
+    dark.extend(darkBlue)
+    dark.extend(darkGreen)
+    dark.extend(darkLight)
+    dark.extend(darkDark)
+    dark.extend(darkBlank)
+
+
+def mergeBlanks():    
+    blank.extend(blankRed)
+    blank.extend(blankBlue)
+    blank.extend(blankGreen)
+    blank.extend(blankLight)
+    blank.extend(blankDark)
+
 
 def clearIds():
     red.clear()
@@ -245,6 +529,7 @@ def clearIds():
     light.clear()
     dark.clear()
     blank.clear()
+
 
 if(args.id_test):
     testIds()
