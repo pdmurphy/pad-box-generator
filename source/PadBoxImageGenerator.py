@@ -21,15 +21,46 @@ args = parser.parse_args()
 #card_templates_file = args.imgs_per_row
 #output_dir = args.output_dir
 
-# make empty list for each color
+# make empty list for each color and subattribute per color
 # also current id to use in separateIds
 global current_id
 red = []
+redRed = []
+redBlue = []
+redGreen = []
+redLight = []
+redDark = []
+
 green = []
+greenRed = []
+greenBlue = []
+greenGreen = []
+greenLight = []
+greenDark = []
+
 blue = []
+blueRed = []
+blueBlue = []
+blueGreen = []
+blueLight = []
+blueDark = []
+
 dark = []
+darkRed = []
+darkBlue = []
+darkGreen = []
+darkLight = []
+darkDark = []
+
 light = []
+lightRed = []
+lightBlue = []
+lightGreen = []
+lightLight = []
+lightDark = []
+
 blank = []
+
 current_id = 0
 portraitsPath = args.portraits_dir
 
@@ -38,10 +69,8 @@ def testIds():
     readIdFile(args.id_file)
 
 def readIdFile(idfilePath):
-    # C:/Users/Patrick/Desktop/Coding/PaDBox/idsListNoSpace.txt
     with open(idfilePath) as csvfile:
         csvReader = csv.reader(csvfile, delimiter=',')
-        #print("csvreader len", len(csvReader))
         rowcount = 0
         for row in csvReader:
             if(rowcount>=1):
@@ -53,8 +82,6 @@ def readIdFile(idfilePath):
                 rowcount += 1
 
 
-# myFilePath = "C:/Users/Patrick/Desktop/Coding/PaDBox/resources/PaDTextures/portraits/"
-
 # Pixel location to check
 # x:26, y:3 this is a spot on the border
 # red: (255,153,102,255)
@@ -65,13 +92,12 @@ def readIdFile(idfilePath):
 # empty/noMain attribute (255, 255, 255, 255)
 
 
-def getColor(filePath, fileName):
+def getColor(filePath, fileName): # 85,85
     combinedPath = filePath + fileName + ".png"
     image = Image.open(combinedPath)
     color = image.getpixel((26, 3))
-    print("color check")
-    print(colorHelper(color))
-    return colorHelper(color)
+    subColor = image.getpixel((85,85))
+    return (colorHelper(color), colorSubAttHelper(subColor))
 
 
 def colorHelper(RGBValue):
@@ -83,6 +109,17 @@ def colorHelper(RGBValue):
         (238, 153, 238, 255): "dark",
         (255, 255, 255, 255): "blank"  # No Main Attribute
     }.get(RGBValue, "???")
+
+
+def colorSubAttHelper(RGBValue):
+    return {
+        (255, 119, 51, 255): "red",
+        (42, 128, 172, 255): "blue",
+        (76, 229, 64, 255): "green",
+        (255, 242, 72, 255): "light",
+        (121, 68, 145, 255): "dark",
+    }.get(RGBValue, "No SubAtt")
+
 
 # this is where things get a bit wonky
 # current_id has to be a global variable that is changed so it can be used by the add functions
