@@ -12,7 +12,7 @@ inputGroup.add_argument("--id_file", required=True, help="Path to text file of i
 inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
 inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
 inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
-inputGroup.add_argument("--no_ordering", action="store_true", help="Preserves order of ids for each color. Still color separated")
+inputGroup.add_argument("--no_ordering", action="store_true", help="Preserves order of ids for each color. Still color separated (including subatt)")
 
 helpGroup = parser.add_argument_group("Help")
 helpGroup.add_argument("-h", "--help", action="help", help="Displays this help message and exits.")
@@ -92,15 +92,11 @@ def readIdFile(idfilePath):
                 rowcount += 1
 
 
-# Pixel location to check
+# Pixel locations to check
 # x:26, y:3 this is a spot on the border
-# red: (255,153,102,255)
-# blue: (153, 187, 221, 255)
-# green: (136, 238, 119, 255)
-# light: (255, 255, 119, 255)
-# dark:(238, 153, 238, 255)
-# empty/noMain attribute (255, 255, 255, 255)
-
+# x:85, y:85 for subattribute within the circle spot itself
+# technically there is a chance that some art could have the same
+# color pixel as a subatt pixel. im willing to take that chance
 
 def getColor(filePath, fileName):
     combinedPath = filePath + fileName + ".png"
@@ -136,55 +132,51 @@ def colorSubAttHelper(RGBValue):
 # refer to comment section before addId
 def separateIds(allIds):
     for i in range(len(allIds)):
-        # print("id:", allIds[i])
         global current_id
         current_id = allIds[i]
-        # print("current id in separate", current_id)
         addId(getColor(portraitsPath, allIds[i]))
 
 # I cant use the same return match style as getColor to call red.append(id) for example
 # python doesn't work this way.
 # it would call the functions and the returned value from those functions as assigned to that key of the dictionary
 # so instead I have to call individual add functions, and have it use current_id
-# if i called the individual functions passing id. 
-#  it would be the same problem as if I just did red.append(id)
+# if i called the individual functions passing id.
+# it would be the same problem as if I just did red.append(id)
 # not a fan of this system but without doing a different type of switch statement or case match
-# i do not believe it is possible. 
+# i do not believe it is possible.
 
 
 def addId(colors):
-    #  print("add id with current id", current_id, "and color", color
-    print("current id", current_id, "colors tuple before switcher", colors)
-
     switcher = {
+        # red
         ("red", "red"): addRedRed,
         ("red", "blue"): addRedBlue,
         ("red", "green"): addRedGreen,
         ("red", "light"): addRedLight,
         ("red", "dark"): addRedDark,
         ("red", "blank"): addRed,
-
+        # blue
         ("blue", "red"): addBlueRed,
         ("blue", "blue"): addBlueBlue,
         ("blue", "green"): addBlueGreen,
         ("blue", "light"): addBlueLight,
         ("blue", "dark"): addBlueDark,
         ("blue", "blank"): addBlue,
-
+        # green
         ("green", "red"): addGreenRed,
         ("green", "blue"): addGreenBlue,
         ("green", "green"): addGreenGreen,
         ("green", "light"): addGreenLight,
         ("green", "dark"): addGreenDark,
         ("green", "blank"): addGreen,
-
+        # light
         ("light", "red"): addLightRed,
         ("light", "blue"): addLightBlue,
         ("light", "green"): addLightGreen,
         ("light", "light"): addLightLight,
         ("light", "dark"): addLightDark,
         ("light", "blank"): addLight,
-
+        # dark
         ("dark", "red"): addDarkRed,
         ("dark", "blue"): addDarkBlue,
         ("dark", "green"): addDarkGreen,
@@ -200,7 +192,7 @@ def addId(colors):
     }
     func = switcher.get(colors, 'Invalid colors')
     return func()
-# Currently no real error handling 
+# Currently no real error handling
 
 
 def generateBoxRow(index, portraitsPerRow, colorArray):
@@ -238,7 +230,7 @@ def generateBoxCollage(portraitsPerRow):
         sortColors()
         mergeColors()
         allColors = [red, blue, green, light, dark, blank]
-    #start with empty collage
+    # start with empty collage
     collage = np.zeros((100, 100, 4), np.uint8)
     for colorArray in allColors:
         index = 0
@@ -469,6 +461,7 @@ def sortBlanks():
     blankLight.sort()
     blankDark.sort()
 
+
 def mergeReds():
     red.extend(redRed)
     red.extend(redBlue)
@@ -514,7 +507,7 @@ def mergeDarks():
     dark.extend(darkBlank)
 
 
-def mergeBlanks():    
+def mergeBlanks():
     blank.extend(blankRed)
     blank.extend(blankBlue)
     blank.extend(blankGreen)
@@ -534,5 +527,6 @@ def clearIds():
 if(args.id_test):
     testIds()
 else:
+    # if I want to have a correct "unordered" option. I would need to check and have readIdFile run differently (or make a secondReadIdFile for unordered specifically)
     readIdFile(args.id_file)
-    generateBoxCollage(args.imgs_per_row)        
+    generateBoxCollage(args.imgs_per_row)
