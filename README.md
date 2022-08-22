@@ -1,5 +1,7 @@
 # pad-box-generator
 
+This is a small project done to learn python as well as tackle a unique personal use case.
+
 Initial ReadME - only basic summary
 
 with the help of the Tsubotki team, they were able to take my document
