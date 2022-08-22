@@ -93,20 +93,6 @@ def readIdFile(idfilePath):
                 rowcount += 1
 
 
-def readIdFilePreserverOrder(idfilePath):
-    with open(idfilePath) as csvfile:
-        csvReader = csv.reader(csvfile, delimiter=',')
-        rowcount = 0
-        for row in csvReader:
-            if(rowcount >= 1):
-                print("Your ID file is incorrect. Multiple rows")
-                exit()
-                # not robust and could be worked around but don't want to deal with it as I don't need it
-            else:
-                separateIds(row)
-                rowcount += 1
-
-
 # Pixel locations to check
 # x:26, y:3 this is a spot on the border
 # x:85, y:85 for subattribute within the circle spot itself
@@ -552,9 +538,6 @@ def clearIds():
 if(args.id_test):
     testIds()
 else:
-    if(args.keep_order):
-        readIdFilePreserverOrder(args.id_file)
-    else:
-        readIdFile(args.id_file)
+    readIdFile(args.id_file)
     generateBoxCollage(args.imgs_per_row)
     print("Complete")
