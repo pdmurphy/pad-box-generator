@@ -12,7 +12,7 @@ inputGroup.add_argument("--id_file", required=True, help="Path to text file of i
 inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
 inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
 inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
-inputGroup.add_argument("--no_ordering", action="store_true", help="Preserves order of ids for each color. Still color separated (including subatt)")
+inputGroup.add_argument("--keep_order", action="store_true", help="Preserves order of ids in text file")
 
 helpGroup = parser.add_argument_group("Help")
 helpGroup.add_argument("-h", "--help", action="help", help="Displays this help message and exits.")
@@ -22,6 +22,7 @@ args = parser.parse_args()
 # make empty list for each color and subattribute per color
 # also current id to use in separateIds
 global current_id
+keep_ordering = []
 red = []
 redRed = []
 redBlue = []
@@ -92,6 +93,20 @@ def readIdFile(idfilePath):
                 rowcount += 1
 
 
+def readIdFilePreserverOrder(idfilePath):
+    with open(idfilePath) as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',')
+        rowcount = 0
+        for row in csvReader:
+            if(rowcount >= 1):
+                print("Your ID file is incorrect. Multiple rows")
+                exit()
+                # not robust and could be worked around but don't want to deal with it as I don't need it
+            else:
+                separateIds(row)
+                rowcount += 1
+
+
 # Pixel locations to check
 # x:26, y:3 this is a spot on the border
 # x:85, y:85 for subattribute within the circle spot itself
@@ -134,7 +149,10 @@ def separateIds(allIds):
     for i in range(len(allIds)):
         global current_id
         current_id = allIds[i]
-        addId(getColor(portraitsPath, allIds[i]))
+        if(not args.keep_order):
+            addId(getColor(portraitsPath, allIds[i]))
+        else:
+            keep_ordering.append(current_id)
 
 # I cant use the same return match style as getColor to call red.append(id) for example
 # python doesn't work this way.
@@ -223,9 +241,11 @@ def generateBoxRow(index, portraitsPerRow, colorArray):
 def generateBoxCollage(portraitsPerRow):
     allColors = None
     # figure out if preserving order or if sorting
-    if (args.no_ordering):
-        mergeColors()
-        allColors = [red, blue, green, light, dark, blank]
+    if (args.keep_order):
+        # ugly solution but it's just simpler this way for the keep order case.
+        # red is needed in the while loop/if statement below and not worth hassle of changing.
+        keepOrderMergeToRed()
+        allColors = [red]
     else:
         sortColors()
         mergeColors()
@@ -391,6 +411,11 @@ def addBlankDark():
     blankDark.append(current_id)
 
 
+def keepOrderMergeToRed():
+    # ugly solution but it's just simpler this way for the keep order case.
+    red.extend(keep_ordering)
+
+
 def sortColors():
     sortReds()
     sortBlues()
@@ -527,6 +552,9 @@ def clearIds():
 if(args.id_test):
     testIds()
 else:
-    # if I want to have a correct "unordered" option. I would need to check and have readIdFile run differently (or make a secondReadIdFile for unordered specifically)
-    readIdFile(args.id_file)
+    if(args.keep_order):
+        readIdFilePreserverOrder(args.id_file)
+    else:
+        readIdFile(args.id_file)
     generateBoxCollage(args.imgs_per_row)
+    print("Complete")
