@@ -1,5 +1,13 @@
 import tkinter as tk
 import tkinter.filedialog as fd
+#import os
+#print(os.getcwd())
+#import sys
+#print("D:\\Desktop\\Coding\\PaDBox\\source")
+#sys.path.insert(1, "D:\\Desktop\\Coding\\PaDBox\\source") # based on comments you should use **1 not 0**
+#from PaDBoxImageGenerator import PaDBoxImageGenerator # imports correct file
+
+import PaDBoxImageGenerator
 
 def get_parameters():
     # create the main window for the dialog box
@@ -37,7 +45,6 @@ def get_parameters():
     for i, label in enumerate(parameter_labels):
         tk.Label(root, text=label).grid(row=i, column=0)
         entry = tk.Entry(root)
-        print("label " + label)
     
         if label.__eq__("Portraits per row:"):  # set default value for Portraits per row
             entry.insert(i, "6")
@@ -81,11 +88,11 @@ def get_parameters():
         #parameter_values.append(True)
         parameters = parameter_values
 
-    browse_button_directory_1 = tk.Button(root, text="Browse", command=lambda: select_directory_path(0))
-    browse_button_directory_1.grid(row=0, column=2)
+    browse_button_1 = tk.Button(root, text="Browse", command=lambda: select_file_path(0))
+    browse_button_1.grid(row=0, column=2)
 
-    browse_button_1 = tk.Button(root, text="Browse", command=lambda: select_file_path(1))
-    browse_button_1.grid(row=1, column=2)
+    browse_button_directory_1 = tk.Button(root, text="Browse", command=lambda: select_directory_path(1))
+    browse_button_directory_1.grid(row=1, column=2)
 
     submit_button = tk.Button(root, text="Submit", command=submit, state="normal")  
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=2)
@@ -100,7 +107,17 @@ def get_parameters():
 
     return parameters if 'parameters' in globals() else None
 
-print("hello world script")
+print("Hello world script")
+#get_parameters(process_parameters)
 parameters = get_parameters()
 print(parameters)
 
+#do the same call of what PaDBoxImageGenerator.py does at the end
+
+#def call_PaDBox(parameters):
+#    if(args.id_test):
+#        testIds()
+#    else:
+#        readIdFile(args.id_file)
+#        generateBoxCollage(args.imgs_per_row)
+#        print("Complete")
