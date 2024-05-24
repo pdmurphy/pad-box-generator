@@ -4,9 +4,6 @@ This is a small project done to learn python as well as tackle a unique personal
 
 Initial ReadME - only basic summary
 
-with the help of the Tsubotki team, they were able to take my document
-https://docs.google.com/spreadsheets/d/1paUBgapY2p0fNy5XH7LVByDNWrFRp17YZclWJz1jAzM/edit#gid=1601991606
-turn it into a list of IDs
+This project can take a list of the ID numbers of cards from Puzzle & Dragons and create an image that would be similar to my box in Puzzle & Dragons. Due to DMCA reasons I am not hosting the images so you have to provide/have the images yourself.
 
-with that list + the images of all icons, this projects aim is to take that information and create an image that would be similar to my box in Puzzle & Dragons
-
+Thanks to the Tsubotki team for some assistance.
