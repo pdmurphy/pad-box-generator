@@ -41,6 +41,16 @@ def get_parameters():
             return True
         submit_button.config(state="disabled")  # Disable the submit button for non-positive integers
         return True  
+
+   # def validate_positive_integer(P):
+    #    browse_1_entry = parameter_entries[0].get()
+     #   browse_directory_1_entry = parameter_entries[1].get()
+#
+ #       if P.isdigit() and int(P) > 0 and browse_1_entry and browse_directory_1_entry:
+  #          submit_button.config(state="normal")  # Enable the submit button when the input is a positive integer
+   #         return True
+    #    submit_button.config(state="disabled")  # Disable the submit button for non-positive integers
+     #   return True    
         
     for i, label in enumerate(parameter_labels):
         tk.Label(root, text=label).grid(row=i, column=0)
@@ -75,26 +85,31 @@ def get_parameters():
 
     def select_directory_path(entry_index):
         directory_path = fd.askdirectory(initialdir="/", title=f"Select directory for Directory Path {entry_index}")
+         # Add trailing slash if it is missing
+        if directory_path and not directory_path.endswith('/'):
+            directory_path += '/'
         parameter_entries[entry_index].delete(0, tk.END)
         parameter_entries[entry_index].insert(0, directory_path)
 
     def submit():
         parameter_values = []
-        for entry in parameter_entries:
-            input_str = entry.get()
-            parameter_values.append(input_str)
+        for i, entry in enumerate(parameter_entries):
+            input_value  = entry.get()
+            if parameter_labels[i] == "Portraits per row:":
+                input_value = int(entry.get())
+            parameter_values.append(input_value)
         root.destroy()
         global parameters
         #parameter_values.append(True)
         parameters = parameter_values
 
-    browse_button_1 = tk.Button(root, text="Browse", command=lambda: select_file_path(0))
+    browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
     browse_button_1.grid(row=0, column=2)
 
-    browse_button_directory_1 = tk.Button(root, text="Browse", command=lambda: select_directory_path(1))
+    browse_button_directory_1 = tk.Button(root, text="Browse for portraits folder", command=lambda: select_directory_path(1))
     browse_button_directory_1.grid(row=1, column=2)
 
-    submit_button = tk.Button(root, text="Submit", command=submit, state="normal")  
+    submit_button = tk.Button(root, text="Submit", command=submit, state="disabled") #start ui with submit disabled since you need to select paths. 
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=2)
 
 
@@ -107,17 +122,21 @@ def get_parameters():
 
     return parameters if 'parameters' in globals() else None
 
-print("Hello world script")
-#get_parameters(process_parameters)
+def call_PaDBox(parameters):
+    if(False): #true if test run read
+        testIds()
+    else:
+        PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
+        PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
+
 parameters = get_parameters()
-print(parameters)
+#print(parameters) #was used for debug
 
-#do the same call of what PaDBoxImageGenerator.py does at the end
+#set args used in PaDBox Generator code because I didn't want to refactor and can just use it's set args for some of the globals
+#reminder of the order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
+PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
 
-#def call_PaDBox(parameters):
-#    if(args.id_test):
-#        testIds()
-#    else:
-#        readIdFile(args.id_file)
-#        generateBoxCollage(args.imgs_per_row)
-#        print("Complete")
+call_PaDBox(parameters)
+
+print("Complete ui file")
+
