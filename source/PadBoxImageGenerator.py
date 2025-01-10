@@ -2,21 +2,13 @@ from PIL import Image
 import numpy as np
 import argparse
 import csv
-
+import sys
 # Main function calls at bottom.
 
-parser = argparse.ArgumentParser(description="Generates P&D image collage from a list of Ids.", add_help=False)
-
-inputGroup = parser.add_argument_group("Input")
-inputGroup.add_argument("--id_file", required=True, help="Path to text file of id numbers separated by comma")
-inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
-inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
-inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
-inputGroup.add_argument("--keep_order", action="store_true", help="Preserves order of ids in text file")
-
-helpGroup = parser.add_argument_group("Help")
-helpGroup.add_argument("-h", "--help", action="help", help="Displays this help message and exits.")
-args = parser.parse_args()
+if len(sys.argv) > 1:
+    anyArguments = True
+else:
+    anyArguments = False
 
 
 # make empty list for each color and subattribute per color
@@ -71,12 +63,44 @@ blankLight = []
 blankDark = []
 
 current_id = 0
-portraitsPath = args.portraits_dir
+
+portraitsPath = ""
+id_file = ""
+imgs_per_row = 6
+id_test = False
+keep_order = False
+
+def setArgs(id_file_arg, portraits_dir_arg, imgs_per_row_arg, id_test_arg, keep_order_arg):
+    global portraitsPath
+    portraitsPath = portraits_dir_arg
+    global id_file
+    id_file = id_file_arg
+    global imgs_per_row
+    imgs_per_row = imgs_per_row_arg
+    global id_test
+    id_test = id_test_arg
+    global keep_order
+    keep_order = keep_order_arg
+
+if(anyArguments):
+    parser = argparse.ArgumentParser(description="Generates P&D image collage from a list of Ids.", add_help=False)
+    #spacer
+    inputGroup = parser.add_argument_group("Input")
+    inputGroup.add_argument("--id_file", required=True, help="Path to text file of id numbers separated by comma")
+    inputGroup.add_argument("--portraits_dir", required=True, help="Path to card portraits")
+    inputGroup.add_argument("--imgs_per_row", const=6, default=6, nargs="?", type=int, help="Number of portraits per row. Default is 6")
+    inputGroup.add_argument("--id_test", action="store_true", help="this will test if your id file can find all portraits")
+    inputGroup.add_argument("--keep_order", action="store_true", help="Preserves order of ids in text file")
+    #spacer
+    helpGroup = parser.add_argument_group("Help")
+    helpGroup.add_argument("-h", "--help", action="help", help="Displays this help message and exits.")
+    args = parser.parse_args()
+    setArgs(args.id_file, args.portraits_dir, args.imgs_per_row, args.id_test, args.keep_order)
 
 
 def testIds():
     # reads file and calls separate Ids
-    readIdFile(args.id_file)
+    readIdFile(id_file)
 
 
 def readIdFile(idfilePath):
@@ -135,7 +159,7 @@ def separateIds(allIds):
     for i in range(len(allIds)):
         global current_id
         current_id = allIds[i]
-        if(not args.keep_order):
+        if(not keep_order):
             addId(getColor(portraitsPath, allIds[i]))
         else:
             keep_ordering.append(current_id)
@@ -227,7 +251,7 @@ def generateBoxRow(index, portraitsPerRow, colorArray):
 def generateBoxCollage(portraitsPerRow):
     allColors = None
     # figure out if preserving order or if sorting
-    if (args.keep_order):
+    if (keep_order):
         # ugly solution but it's just simpler this way for the keep order case.
         # red is needed in the while loop/if statement below and not worth hassle of changing.
         keepOrderMergeToRed()
@@ -535,9 +559,9 @@ def clearIds():
     blank.clear()
 
 
-if(args.id_test):
+if(id_test):
     testIds()
-else:
-    readIdFile(args.id_file)
-    generateBoxCollage(args.imgs_per_row)
+elif(anyArguments):
+    readIdFile(id_file)
+    generateBoxCollage(imgs_per_row)
     print("Complete")

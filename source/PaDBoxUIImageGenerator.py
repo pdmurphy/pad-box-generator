@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.filedialog as fd
+import tkinter.messagebox as mb
 #import os
 #print(os.getcwd())
 #import sys
@@ -109,7 +110,7 @@ def get_parameters():
     browse_button_directory_1 = tk.Button(root, text="Browse for portraits folder", command=lambda: select_directory_path(1))
     browse_button_directory_1.grid(row=1, column=2)
 
-    submit_button = tk.Button(root, text="Submit", command=submit, state="disabled") #start ui with submit disabled since you need to select paths. 
+    submit_button = tk.Button(root, text="Submit", command=submit, state="normal") #start ui with submit disabled since you need to select paths. 
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=2)
 
 
@@ -129,6 +130,16 @@ def call_PaDBox(parameters):
         PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
         PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
 
+#check if all required parameters are filled in. "Id File Path:", "Portraits Directory:", "Portraits per row:"
+def checkInput(parameters):
+    #strip the first two for empty space before checking if empty. 
+    if(parameters[0].strip() and parameters[1].strip() and parameters[2]):
+        return True
+    else:
+        #if a required parameter is empty. Throw up an error box.
+        mb.showerror("Error", "You are missing a required parameter") 
+        return False
+
 parameters = get_parameters()
 #print(parameters) #was used for debug
 
@@ -136,7 +147,10 @@ parameters = get_parameters()
 #reminder of the order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
 PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
 
-call_PaDBox(parameters)
+#check if all required parameters are filled and then otherwise call the image generation.
+if(checkInput(parameters)):
+    call_PaDBox(parameters)
+    print("image complete")
 
-print("Complete ui file")
+print("Program complete")
 
