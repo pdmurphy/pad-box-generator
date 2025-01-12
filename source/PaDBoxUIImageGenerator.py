@@ -150,6 +150,7 @@ PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parame
 #check if all required parameters are filled and then otherwise call the image generation.
 if(checkInput(parameters)):
     call_PaDBox(parameters)
+    mb.showinfo("Complete","PaDBox.png has been generated")
     print("image complete")
 
 print("Program complete")
