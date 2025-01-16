@@ -10,7 +10,7 @@ import tkinter.messagebox as mb
 
 import PaDBoxImageGenerator
 
-def get_parameters():
+def main():
     # create the main window for the dialog box
     root = tk.Tk()
     root.title("Enter Parameters")
@@ -99,10 +99,12 @@ def get_parameters():
             if parameter_labels[i] == "Portraits per row:":
                 input_value = int(entry.get())
             parameter_values.append(input_value)
-        root.destroy()
+        #old behavior was destroy on submit. Closing the mainloop and the window. 
+        #Instead get the parameters and then move onto the PaDBox generation.
         global parameters
         #parameter_values.append(True)
         parameters = parameter_values
+        on_submit(parameters)
 
     browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
     browse_button_1.grid(row=0, column=2)
@@ -131,7 +133,7 @@ def call_PaDBox(parameters):
         PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
 
 #check if all required parameters are filled in. "Id File Path:", "Portraits Directory:", "Portraits per row:"
-def checkInput(parameters):
+def check_input(parameters):
     #strip the first two for empty space before checking if empty. 
     if(parameters[0].strip() and parameters[1].strip() and parameters[2]):
         return True
@@ -140,18 +142,30 @@ def checkInput(parameters):
         mb.showerror("Error", "You are missing a required parameter") 
         return False
 
-parameters = get_parameters()
+#called when submit button clicked. 
+#Sets arguments, checks parameters, then calls and starts the image generation
+def on_submit(parameters):
+    PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
+    if(check_input(parameters)):
+        call_PaDBox(parameters)
+        mb.showinfo("Complete","PaDBox.png has been generated")
+        print("image complete")
+
+def testPrint():
+    print("yo test print")
+    print(parameters)
+
+start = main()
 #print(parameters) #was used for debug
 
 #set args used in PaDBox Generator code because I didn't want to refactor and can just use it's set args for some of the globals
 #reminder of the order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
-PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
 
 #check if all required parameters are filled and then otherwise call the image generation.
-if(checkInput(parameters)):
-    call_PaDBox(parameters)
-    mb.showinfo("Complete","PaDBox.png has been generated")
-    print("image complete")
+#if(check_input(parameters)):
+#    call_PaDBox(parameters)
+#    mb.showinfo("Complete","PaDBox.png has been generated")
+#    print("image complete")
 
 print("Program complete")
 
