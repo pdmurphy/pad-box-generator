@@ -31,7 +31,8 @@ def main():
 
     def show_tooltip(event):
         tooltip_label.config(text=tooltips[event.widget.tooltip])
-        tooltip_label.place(x=10, y=submit_button.winfo_y() + submit_button.winfo_height() + 5)  # Fixed x-coordinate
+        tooltip_label.place(x=10, y=175)  # Fixed x-coordinate
+        #submit_button.winfo_y() + submit_button.winfo_height() Doesnt currently do anything unless you pack canvas
 
     def hide_tooltip(event):
         tooltip_label.place_forget()
@@ -42,17 +43,7 @@ def main():
             return True
         submit_button.config(state="disabled")  # Disable the submit button for non-positive integers
         return True  
-
-   # def validate_positive_integer(P):
-    #    browse_1_entry = parameter_entries[0].get()
-     #   browse_directory_1_entry = parameter_entries[1].get()
-#
- #       if P.isdigit() and int(P) > 0 and browse_1_entry and browse_directory_1_entry:
-  #          submit_button.config(state="normal")  # Enable the submit button when the input is a positive integer
-   #         return True
-    #    submit_button.config(state="disabled")  # Disable the submit button for non-positive integers
-     #   return True    
-        
+       
     for i, label in enumerate(parameter_labels):
         tk.Label(root, text=label).grid(row=i, column=0)
         entry = tk.Entry(root)
@@ -113,8 +104,22 @@ def main():
     browse_button_directory_1.grid(row=1, column=2)
 
     submit_button = tk.Button(root, text="Submit", command=submit, state="normal") #start ui with submit disabled since you need to select paths. 
-    submit_button.grid(row=len(parameter_labels), column=0, columnspan=2)
+    submit_button.grid(row=len(parameter_labels), column=0, columnspan=2, pady=2)
 
+    current_status = "Waiting for submission"
+    #current_status = StringVar()
+    #current_status.set("Status: Waiting for submission")
+    #textvariable=current_status
+    #current_status="Checking parameters"
+    status_label = tk.Label(root, text="Status: " + current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
+    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=6) #manual grid position big ugly.
+    #.place(x=10, y=submit_button.winfo_y() + submit_button.winfo_height() + 5)
+    # tooltip_label = tk.Label(root, bg="yellow", relief="solid", borderwidth=1, padx=5, pady=0)
+#Status:
+#current_status = StringVar()
+#Label(master, textvariable=v).pack()
+
+#v.set("New Text!")
 
     # wait for the dialog to become visible
     root.wait_visibility()
