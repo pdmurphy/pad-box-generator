@@ -19,6 +19,7 @@ def main():
     # create a label and entry widget for each parameter
     parameter_labels = ["Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"]
     parameter_entries = []
+    status_types = ["Waiting for submission", "Checking parameters", "Reading IDs", "Generating PaDBox.png image"]
     
     # Tooltip dictionary
     tooltips = {
@@ -106,13 +107,16 @@ def main():
     submit_button = tk.Button(root, text="Submit", command=submit, state="normal") #start ui with submit disabled since you need to select paths. 
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=2, pady=2)
 
-    current_status = "Waiting for submission"
-    #current_status = StringVar()
-    #current_status.set("Status: Waiting for submission")
-    #textvariable=current_status
-    #current_status="Checking parameters"
-    status_label = tk.Label(root, text="Status: " + current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
-    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=6) #manual grid position big ugly.
+   
+    #new u pdating text way
+    current_status = tk.StringVar()
+    current_status.set("Status: " + status_types[0])
+    status_label = tk.Label(root, textvariable=current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
+    status_label.pack
+    #old static way
+    #current_status = "Waiting for submission"
+    #status_label = tk.Label(root, text="Status: " + current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
+    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=6) #manual grid position that is very ugly.
     #.place(x=10, y=submit_button.winfo_y() + submit_button.winfo_height() + 5)
     # tooltip_label = tk.Label(root, bg="yellow", relief="solid", borderwidth=1, padx=5, pady=0)
 #Status:
