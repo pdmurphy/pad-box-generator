@@ -10,6 +10,8 @@ import tkinter.messagebox as mb
 
 import PaDBoxImageGenerator
 
+STATUS_TYPES = ["Waiting for submission", "Checking parameters", "Reading IDs", "Generating PaDBox.png image"]
+
 def main():
     # create the main window for the dialog box
     root = tk.Tk()
@@ -19,8 +21,9 @@ def main():
     # create a label and entry widget for each parameter
     parameter_labels = ["Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"]
     parameter_entries = []
-    status_types = ["Waiting for submission", "Checking parameters", "Reading IDs", "Generating PaDBox.png image"]
-    
+    current_status = tk.StringVar()
+    current_status.set("Status: " + STATUS_TYPES[0])
+
     # Tooltip dictionary
     tooltips = {
         "Id File Path:": "Path to text file of id numbers separated by comma",
@@ -84,7 +87,7 @@ def main():
         parameter_entries[entry_index].delete(0, tk.END)
         parameter_entries[entry_index].insert(0, directory_path)
 
-    def submit():
+    def submit(current_status):
         parameter_values = []
         for i, entry in enumerate(parameter_entries):
             input_value  = entry.get()
@@ -96,7 +99,7 @@ def main():
         global parameters
         #parameter_values.append(True)
         parameters = parameter_values
-        on_submit(parameters)
+        on_submit(parameters, current_status)
 
     browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
     browse_button_1.grid(row=0, column=2)
@@ -104,21 +107,17 @@ def main():
     browse_button_directory_1 = tk.Button(root, text="Browse for portraits folder", command=lambda: select_directory_path(1))
     browse_button_directory_1.grid(row=1, column=2)
 
-    submit_button = tk.Button(root, text="Submit", command=submit, state="normal") #start ui with submit disabled since you need to select paths. 
-    submit_button.grid(row=len(parameter_labels), column=0, columnspan=2, pady=2)
+    submit_button = tk.Button(root, text="Submit", command= lambda: submit(current_status), state="normal") #start ui with submit disabled since you need to select paths. 
+    submit_button.grid(row=len(parameter_labels), column=0, columnspan=1, pady=2)
 
    
-    #new u pdating text way
-    current_status = tk.StringVar()
-    current_status.set("Status: " + status_types[0])
+    #new updating text way
     status_label = tk.Label(root, textvariable=current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
     status_label.pack
-    #old static way
-    #current_status = "Waiting for submission"
-    #status_label = tk.Label(root, text="Status: " + current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
-    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=6) #manual grid position that is very ugly.
+    #other option to move toward middle is columnspan 2 for submit button and 3 for status label.
+    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=2) #manual grid position that is very ugly.
     #.place(x=10, y=submit_button.winfo_y() + submit_button.winfo_height() + 5)
-    # tooltip_label = tk.Label(root, bg="yellow", relief="solid", borderwidth=1, padx=5, pady=0)
+    
 #Status:
 #current_status = StringVar()
 #Label(master, textvariable=v).pack()
@@ -134,15 +133,18 @@ def main():
 
     return parameters if 'parameters' in globals() else None
 
-def call_PaDBox(parameters):
+def call_PaDBox(parameters, status):
     if(False): #true if test run read
         testIds()
     else:
+        status.set("Status: " + STATUS_TYPES[2])
         PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
+        status.set("Status: " + STATUS_TYPES[3])
         PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
 
 #check if all required parameters are filled in. "Id File Path:", "Portraits Directory:", "Portraits per row:"
-def check_input(parameters):
+def check_input(parameters, status):
+    status.set("Status: " + STATUS_TYPES[1])
     #strip the first two for empty space before checking if empty. 
     if(parameters[0].strip() and parameters[1].strip() and parameters[2]):
         return True
@@ -153,9 +155,9 @@ def check_input(parameters):
 
 #called when submit button clicked. 
 #Sets arguments, checks parameters, then calls and starts the image generation
-def on_submit(parameters):
+def on_submit(parameters, status):
     PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
-    if(check_input(parameters)):
+    if(check_input(parameters, status)):
         call_PaDBox(parameters)
         mb.showinfo("Complete","PaDBox.png has been generated")
         print("image complete")
