@@ -1,6 +1,8 @@
 import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
+from tkinter import PhotoImage
+
 #import os
 #print(os.getcwd())
 #import sys
@@ -110,19 +112,25 @@ def main():
     submit_button = tk.Button(root, text="Submit", command= lambda: submit(current_status), state="normal") #start ui with submit disabled since you need to select paths. 
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=1, pady=2)
 
-   
-    #new updating text way
+    #status label
     status_label = tk.Label(root, textvariable=current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
     status_label.pack
     #other option to move toward middle is columnspan 2 for submit button and 3 for status label.
-    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=2) #manual grid position that is very ugly.
+    status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=2) #manual grid position which is bad practice
     #.place(x=10, y=submit_button.winfo_y() + submit_button.winfo_height() + 5)
     
-#Status:
-#current_status = StringVar()
-#Label(master, textvariable=v).pack()
+    linerider_image = PhotoImage(file="../resources/UIResources/avatar.png")
+    linerider_label = status_label = tk.Label(root, image=linerider_image)
+    linerider_label.pack
+    linerider_label.grid(row=len(parameter_labels)+1, column=2) # tried different rows and don't really like result.
+    #would like it to not push around the status and status label. 
+    #to change an image into another image you do .config(image=newimage)
 
-#v.set("New Text!")
+#attempetd gif which does not work.
+    #linerider_image = PhotoImage(file="../resources/UIResources/LrWaveSidewaysTransparent.gif")
+    #linerider_label = status_label = tk.Label(root, image=linerider_image)
+    #linerider_label.pack
+    #linerider_label.grid(row=len(parameter_labels), column=2)
 
     # wait for the dialog to become visible
     root.wait_visibility()
