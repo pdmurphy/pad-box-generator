@@ -122,9 +122,23 @@ def main():
     linerider_image = PhotoImage(file="../resources/UIResources/avatar.png")
     linerider_label = status_label = tk.Label(root, image=linerider_image)
     linerider_label.pack
-    linerider_label.grid(row=len(parameter_labels)+1, column=2) # tried different rows and don't really like result.
-    #would like it to not push around the status and status label. 
+    linerider_label.grid(row=len(parameter_labels)+2, column=2, rowspan=5) 
+    #like the positioning better. rowspan allows to not move the Status label around. 
+    #Can make it go back to touching the submit button if desired by increasing rowspan to a high number like 100. 
+    #alternate idea to move it up even higher in line with KeepOrder or something to take advantage of the empty space there. 
+    #for another time.
+
     #to change an image into another image you do .config(image=newimage)
+    #root.grid_rowconfigure(len(parameter_labels)+2, weight=2)
+#To make a column or row stretchable, use this option and supply a value that gives the relative weight of this column or row when distributing the extra space. For example, if a widget w contains a grid layout, these lines will distribute three-fourths of the extra space to the first column and one-fourth to the second column:
+#   w.columnconfigure(0, weight=3)
+#  w.columnconfigure(1, weight=1)
+#If this option is not used, the column or row will not stretch. 
+    
+    #test with extra label to see if image gets moved around.
+    #timer label
+    timer_label = tk.Label(root, text="Runtime:", width=30, justify="left", anchor="w", bd=1, relief="solid")
+    timer_label.grid(row=len(parameter_labels)+3, column=0, columnspan=2)
 
 #attempetd gif which does not work.
     #linerider_image = PhotoImage(file="../resources/UIResources/LrWaveSidewaysTransparent.gif")
