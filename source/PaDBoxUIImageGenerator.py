@@ -172,6 +172,7 @@ def check_input(parameters, status):
         return True
     else:
         #if a required parameter is empty. Throw up an error box.
+        status.set("Status: " + STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
         mb.showerror("Error", "You are missing a required parameter") 
         return False
 
@@ -181,6 +182,7 @@ def on_submit(parameters, status):
     PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
     if(check_input(parameters, status)):
         call_PaDBox(parameters)
+        status.set("Status: " + STATUS_TYPES[0]) #reset status 
         mb.showinfo("Complete","PaDBox.png has been generated")
         print("image complete")
 
