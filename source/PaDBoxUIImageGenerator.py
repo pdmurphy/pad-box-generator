@@ -135,10 +135,12 @@ def main():
 #  w.columnconfigure(1, weight=1)
 #If this option is not used, the column or row will not stretch. 
     
+    
+
     #test with extra label to see if image gets moved around.
     #timer label
-    timer_label = tk.Label(root, text="Runtime:", width=30, justify="left", anchor="w", bd=1, relief="solid")
-    timer_label.grid(row=len(parameter_labels)+3, column=0, columnspan=2)
+    #timer_label = tk.Label(root, text="Runtime:", width=30, justify="left", anchor="w", bd=1, relief="solid")
+    #timer_label.grid(row=len(parameter_labels)+3, column=0, columnspan=2)
 
 #attempetd gif which does not work.
     #linerider_image = PhotoImage(file="../resources/UIResources/LrWaveSidewaysTransparent.gif")
@@ -159,8 +161,10 @@ def call_PaDBox(parameters, status):
     if(False): #true if test run read
         testIds()
     else:
+        print("set status" + STATUS_TYPES[2])
         status.set("Status: " + STATUS_TYPES[2])
         PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
+        print("set status" + STATUS_TYPES[3])
         status.set("Status: " + STATUS_TYPES[3])
         PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
 
@@ -172,8 +176,8 @@ def check_input(parameters, status):
         return True
     else:
         #if a required parameter is empty. Throw up an error box.
-        status.set("Status: " + STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
         mb.showerror("Error", "You are missing a required parameter") 
+        status.set("Status: " + STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
         return False
 
 #called when submit button clicked. 
@@ -181,8 +185,8 @@ def check_input(parameters, status):
 def on_submit(parameters, status):
     PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
     if(check_input(parameters, status)):
-        call_PaDBox(parameters)
-        status.set("Status: " + STATUS_TYPES[0]) #reset status 
+        call_PaDBox(parameters, status)
+        #status.set("Status: " + STATUS_TYPES[0]) #reset status  ### REVERT BACK WHEN FIXED STATUS UPDATES
         mb.showinfo("Complete","PaDBox.png has been generated")
         print("image complete")
 
