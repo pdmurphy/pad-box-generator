@@ -157,6 +157,10 @@ def main():
 
     return parameters if 'parameters' in globals() else None
 
+#function to try and test with tomorrow.
+def set_status(status_message, ):
+    status.set("Status: " + message)
+
 def call_PaDBox(parameters, status):
     if(False): #true if test run read
         testIds()
@@ -179,8 +183,7 @@ def check_input(parameters, status):
         mb.showerror("Error", "You are missing a required parameter") 
         status.set("Status: " + STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
         return False
-
-#called when submit button clicked. 
+ 
 #Sets arguments, checks parameters, then calls and starts the image generation
 def on_submit(parameters, status):
     PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
