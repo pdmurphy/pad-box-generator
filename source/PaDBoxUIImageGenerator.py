@@ -24,7 +24,6 @@ def main():
     parameter_labels = ["Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"]
     parameter_entries = []
     current_status = tk.StringVar()
-    current_status.set("Status: " + STATUS_TYPES[0])
 
     # Tooltip dictionary
     tooltips = {
@@ -103,6 +102,41 @@ def main():
         parameters = parameter_values
         on_submit(parameters, current_status)
 
+    #function to try and test with tomorrow.
+    def set_status(status, status_message):
+        status.set("Status: " + status_message)
+        root.update_idletasks()
+
+    def call_PaDBox(parameters, status):
+        if(False): #true if test run read
+            testIds()
+        else:
+            set_status(status, STATUS_TYPES[2])
+            PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
+            set_status(status, STATUS_TYPES[3])
+            PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
+
+    #check if all required parameters are filled in. "Id File Path:", "Portraits Directory:", "Portraits per row:"
+    def check_input(parameters, status):
+        set_status(status, STATUS_TYPES[1])
+        #strip the first two for empty space before checking if empty. 
+        if(parameters[0].strip() and parameters[1].strip() and parameters[2]):
+            return True
+        else:
+            #if a required parameter is empty. Throw up an error box.
+            mb.showerror("Error", "You are missing a required parameter") 
+            set_status(status, STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
+            return False
+     
+    #Sets arguments, checks parameters, then calls and starts the image generation
+    def on_submit(parameters, status):
+        PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
+        if(check_input(parameters, status)):
+            call_PaDBox(parameters, status)
+            set_status(current_status, STATUS_TYPES[0]) #reset status  ### REVERT BACK WHEN FIXED STATUS UPDATES
+            mb.showinfo("Complete","PaDBox.png has been generated")
+            print("image complete")
+
     browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
     browse_button_1.grid(row=0, column=2)
 
@@ -113,6 +147,7 @@ def main():
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=1, pady=2)
 
     #status label
+    set_status(current_status, STATUS_TYPES[0])
     status_label = tk.Label(root, textvariable=current_status, width=30, justify="left", anchor="w", bd=1, relief="solid")
     status_label.pack
     #other option to move toward middle is columnspan 2 for submit button and 3 for status label.
@@ -148,6 +183,13 @@ def main():
     #linerider_label.pack
     #linerider_label.grid(row=len(parameter_labels), column=2)
 
+    #trace used for attempting to debug status updating issue
+    #def my_r(*args):
+    #    print("trace: " + current_status.get())  # Print when variable changes
+    #    status_label.config(text=current_status.get()) 
+    #trace used for attempting to debug status updating issue
+    #current_status.trace_add('write', my_r)
+
     # wait for the dialog to become visible
     root.wait_visibility()
     # grab focus to the first entry widget
@@ -156,42 +198,6 @@ def main():
     root.mainloop()
 
     return parameters if 'parameters' in globals() else None
-
-#function to try and test with tomorrow.
-def set_status(status_message, ):
-    status.set("Status: " + message)
-
-def call_PaDBox(parameters, status):
-    if(False): #true if test run read
-        testIds()
-    else:
-        print("set status" + STATUS_TYPES[2])
-        status.set("Status: " + STATUS_TYPES[2])
-        PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
-        print("set status" + STATUS_TYPES[3])
-        status.set("Status: " + STATUS_TYPES[3])
-        PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
-
-#check if all required parameters are filled in. "Id File Path:", "Portraits Directory:", "Portraits per row:"
-def check_input(parameters, status):
-    status.set("Status: " + STATUS_TYPES[1])
-    #strip the first two for empty space before checking if empty. 
-    if(parameters[0].strip() and parameters[1].strip() and parameters[2]):
-        return True
-    else:
-        #if a required parameter is empty. Throw up an error box.
-        mb.showerror("Error", "You are missing a required parameter") 
-        status.set("Status: " + STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
-        return False
- 
-#Sets arguments, checks parameters, then calls and starts the image generation
-def on_submit(parameters, status):
-    PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
-    if(check_input(parameters, status)):
-        call_PaDBox(parameters, status)
-        #status.set("Status: " + STATUS_TYPES[0]) #reset status  ### REVERT BACK WHEN FIXED STATUS UPDATES
-        mb.showinfo("Complete","PaDBox.png has been generated")
-        print("image complete")
 
 def testPrint():
     print("yo test print")
