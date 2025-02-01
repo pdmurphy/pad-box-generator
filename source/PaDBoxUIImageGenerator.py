@@ -3,13 +3,6 @@ import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 from tkinter import PhotoImage
 
-#import os
-#print(os.getcwd())
-#import sys
-#print("D:\\Desktop\\Coding\\PaDBox\\source")
-#sys.path.insert(1, "D:\\Desktop\\Coding\\PaDBox\\source") # based on comments you should use **1 not 0**
-#from PaDBoxImageGenerator import PaDBoxImageGenerator # imports correct file
-
 import PaDBoxImageGenerator
 
 STATUS_TYPES = ["Waiting for submission", "Checking parameters", "Reading IDs", "Generating PaDBox.png image"]
@@ -98,7 +91,6 @@ def main():
         #old behavior was destroy on submit. Closing the mainloop and the window. 
         #Instead get the parameters and then move onto the PaDBox generation.
         global parameters
-        #parameter_values.append(True)
         parameters = parameter_values
         on_submit(parameters, current_status)
 
@@ -170,8 +162,6 @@ def main():
 #  w.columnconfigure(1, weight=1)
 #If this option is not used, the column or row will not stretch. 
     
-    
-
     #test with extra label to see if image gets moved around.
     #timer label
     #timer_label = tk.Label(root, text="Runtime:", width=30, justify="left", anchor="w", bd=1, relief="solid")
@@ -182,13 +172,6 @@ def main():
     #linerider_label = status_label = tk.Label(root, image=linerider_image)
     #linerider_label.pack
     #linerider_label.grid(row=len(parameter_labels), column=2)
-
-    #trace used for attempting to debug status updating issue
-    #def my_r(*args):
-    #    print("trace: " + current_status.get())  # Print when variable changes
-    #    status_label.config(text=current_status.get()) 
-    #trace used for attempting to debug status updating issue
-    #current_status.trace_add('write', my_r)
 
     # wait for the dialog to become visible
     root.wait_visibility()
