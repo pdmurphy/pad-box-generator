@@ -122,7 +122,10 @@ def main():
      
     #Sets arguments, checks parameters, then calls and starts the image generation
     def on_submit(parameters, status):
+        #set args used in PaDBox Generator code because I didn't want to refactor and can just use it's set args for some of the globals
+        #reminder of the order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
         PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
+        #check if all required parameters are filled and then otherwise call the image generation.
         if(check_input(parameters, status)):
             call_PaDBox(parameters, status)
             set_status(current_status, STATUS_TYPES[0]) #reset status  ### REVERT BACK WHEN FIXED STATUS UPDATES
@@ -187,16 +190,6 @@ def testPrint():
     print(parameters)
 
 start = main()
-#print(parameters) #was used for debug
-
-#set args used in PaDBox Generator code because I didn't want to refactor and can just use it's set args for some of the globals
-#reminder of the order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
-
-#check if all required parameters are filled and then otherwise call the image generation.
-#if(check_input(parameters)):
-#    call_PaDBox(parameters)
-#    mb.showinfo("Complete","PaDBox.png has been generated")
-#    print("image complete")
 
 print("Program complete")
 
