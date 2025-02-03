@@ -18,6 +18,7 @@ def main():
     parameter_entries = []
     current_status = tk.StringVar()
 
+    #Tooltip section
     # Tooltip dictionary
     tooltips = {
         "Id File Path:": "Path to text file of id numbers separated by comma",
@@ -35,6 +36,10 @@ def main():
     def hide_tooltip(event):
         tooltip_label.place_forget()
 
+    tooltip_label = tk.Label(root, bg="yellow", relief="solid", borderwidth=1, padx=5, pady=0)
+
+    #various helper functions
+    #validates
     def validate_positive_integer(P):
         if P.isdigit() and int(P) > 0:
             submit_button.config(state="normal")  # Enable the submit button when the input is a positive integer
@@ -42,6 +47,7 @@ def main():
         submit_button.config(state="disabled")  # Disable the submit button for non-positive integers
         return True  
        
+    #label generation for parameters.   
     for i, label in enumerate(parameter_labels):
         tk.Label(root, text=label).grid(row=i, column=0)
         entry = tk.Entry(root)
@@ -66,8 +72,7 @@ def main():
         label_widget.bind("<Enter>", show_tooltip)  # bind mouse hover events
         label_widget.bind("<Leave>", hide_tooltip)
         
-    tooltip_label = tk.Label(root, bg="yellow", relief="solid", borderwidth=1, padx=5, pady=0)
-
+    
     def select_file_path(entry_index):
         file_path = fd.askopenfilename(initialdir="/", title=f"Select file for File Path {entry_index}", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
         parameter_entries[entry_index].delete(0, tk.END)
@@ -97,46 +102,54 @@ def main():
     #function to try and test with tomorrow.
     def set_status(status, status_message):
         status.set("Status: " + status_message)
-        root.update_idletasks()
+        root.update_idletasks() #required otherwise the status doesn't actually update on the UI between steps
 
+    #makes the function calls to the PaDBoxImageGenerator.
     def call_PaDBox(parameters, status):
         if(False): #true if test run read
             testIds()
         else:
+            #step 1 is to read the Id File
             set_status(status, STATUS_TYPES[2])
             PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
+            #once processed, begin the PaDBox image generation
             set_status(status, STATUS_TYPES[3])
             PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
 
-    #check if all required parameters are filled in. "Id File Path:", "Portraits Directory:", "Portraits per row:"
+    #check for all required parameters.
     def check_input(parameters, status):
         set_status(status, STATUS_TYPES[1])
         #strip the first two for empty space before checking if empty. 
+        #order of parameters in the if statement: "Id File Path:", "Portraits Directory:", "Portraits per row:"
         if(parameters[0].strip() and parameters[1].strip() and parameters[2]):
             return True
         else:
             #if a required parameter is empty. Throw up an error box.
             mb.showerror("Error", "You are missing a required parameter") 
-            set_status(status, STATUS_TYPES[0]) #reset status though shouldn't be needed theoretically.
+            set_status(status, STATUS_TYPES[0]) #reset status
             return False
      
-    #Sets arguments, checks parameters, then calls and starts the image generation
+    #Sets arguments, checks parameters, then starts by calling the image generation helper funection. 
     def on_submit(parameters, status):
-        #set args used in PaDBox Generator code because I didn't want to refactor and can just use it's set args for some of the globals
-        #reminder of the order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
+        #set args used in PaDBox Generator code
+        #order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
         PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
         #check if all required parameters are filled and then otherwise call the image generation.
         if(check_input(parameters, status)):
+            #begin PaDBox image gen helper function.
             call_PaDBox(parameters, status)
-            set_status(current_status, STATUS_TYPES[0]) #reset status  ### REVERT BACK WHEN FIXED STATUS UPDATES
+            set_status(current_status, STATUS_TYPES[0]) #reset status
             mb.showinfo("Complete","PaDBox.png has been generated")
 
+    #button for id file selection
     browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
     browse_button_1.grid(row=0, column=2)
 
+    #button for protraits folder selection
     browse_button_directory_1 = tk.Button(root, text="Browse for portraits folder", command=lambda: select_directory_path(1))
     browse_button_directory_1.grid(row=1, column=2)
 
+    #submit button
     submit_button = tk.Button(root, text="Submit", command= lambda: submit(current_status), state="normal") #start ui with submit disabled since you need to select paths. 
     submit_button.grid(row=len(parameter_labels), column=0, columnspan=1, pady=2)
 
@@ -148,6 +161,7 @@ def main():
     status_label.grid(row=len(parameter_labels)+2, column=0, columnspan=2) #manual grid position which is bad practice
     #.place(x=10, y=submit_button.winfo_y() + submit_button.winfo_height() + 5)
     
+    #line rider image.
     linerider_image = PhotoImage(file="../resources/UIResources/avatar.png")
     linerider_label = status_label = tk.Label(root, image=linerider_image)
     linerider_label.pack
