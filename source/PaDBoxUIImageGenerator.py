@@ -29,7 +29,7 @@ def main():
 
     def show_tooltip(event):
         tooltip_label.config(text=tooltips[event.widget.tooltip])
-        tooltip_label.place(x=10, y=175)  # Fixed x-coordinate
+        tooltip_label.place(x=10, y=200)  # Fixed x-coordinate
         #submit_button.winfo_y() + submit_button.winfo_height() Doesnt currently do anything unless you pack canvas
 
     def hide_tooltip(event):
@@ -130,7 +130,6 @@ def main():
             call_PaDBox(parameters, status)
             set_status(current_status, STATUS_TYPES[0]) #reset status  ### REVERT BACK WHEN FIXED STATUS UPDATES
             mb.showinfo("Complete","PaDBox.png has been generated")
-            print("image complete")
 
     browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
     browse_button_1.grid(row=0, column=2)
@@ -170,7 +169,7 @@ def main():
     #timer_label = tk.Label(root, text="Runtime:", width=30, justify="left", anchor="w", bd=1, relief="solid")
     #timer_label.grid(row=len(parameter_labels)+3, column=0, columnspan=2)
 
-#attempetd gif which does not work.
+    #attempetd gif which does not work.
     #linerider_image = PhotoImage(file="../resources/UIResources/LrWaveSidewaysTransparent.gif")
     #linerider_label = status_label = tk.Label(root, image=linerider_image)
     #linerider_label.pack
