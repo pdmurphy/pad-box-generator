@@ -110,12 +110,17 @@ def main():
             testIds()
         else:
             #step 1 is to read the Id File
-            set_status(status, STATUS_TYPES[2])
-            PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
-            #once processed, begin the PaDBox image generation
-            set_status(status, STATUS_TYPES[3])
-            PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
-
+            set_status(status, STATUS_TYPES[2]) #I suppose this could be moved inside the try, not particular reason.
+            try:
+                PaDBoxImageGenerator.readIdFile(parameters[0]) #id file
+                #once processed, begin the PaDBox image generation
+                set_status(status, STATUS_TYPES[3])
+                PaDBoxImageGenerator.generateBoxCollage(parameters[2]) #number of portraits per row
+                set_status(current_status, STATUS_TYPES[0]) #reset status
+                mb.showinfo("Complete","PaDBox.png has been generated")
+            except Exception as e:
+                 mb.showerror("Error", e)   
+            
     #check for all required parameters.
     def check_input(parameters, status):
         set_status(status, STATUS_TYPES[1])
@@ -138,8 +143,6 @@ def main():
         if(check_input(parameters, status)):
             #begin PaDBox image gen helper function.
             call_PaDBox(parameters, status)
-            set_status(current_status, STATUS_TYPES[0]) #reset status
-            mb.showinfo("Complete","PaDBox.png has been generated")
 
     #button for id file selection
     browse_button_1 = tk.Button(root, text="Browse for Id txt file", command=lambda: select_file_path(0))
