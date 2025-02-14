@@ -168,7 +168,7 @@ def main():
     linerider_image = PhotoImage(file="../resources/UIResources/avatar.png")
     linerider_label = status_label = tk.Label(root, image=linerider_image)
     linerider_label.pack
-    linerider_label.grid(row=len(parameter_labels)+2, column=2, rowspan=5) 
+    linerider_label.grid(row=3, column=2, rowspan=5) 
     #like the positioning better. rowspan allows to not move the Status label around. 
     #Can make it go back to touching the submit button if desired by increasing rowspan to a high number like 100. 
     #alternate idea to move it up even higher in line with KeepOrder or something to take advantage of the empty space there. 
