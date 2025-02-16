@@ -11,10 +11,10 @@ def main():
     # create the main window for the dialog box
     root = tk.Tk()
     root.title("Enter Parameters")
-    root.geometry("500x300")
+    root.geometry("500x200")
 
     # create a label and entry widget for each parameter
-    parameter_labels = ["Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"]
+    parameter_labels = ["Id File Path:", "Portraits Directory:", "Portraits per row:", "Keep Order"] # "ID test (broken dont touch)" removed
     parameter_entries = []
     current_status = tk.StringVar()
 
@@ -24,7 +24,7 @@ def main():
         "Id File Path:": "Path to text file of id numbers separated by comma",
         "Portraits Directory:": "Path to card portraits",
         "Portraits per row:": "Number of portraits per row. Default is 6",
-        "ID test (broken dont touch)": "BROKEN This will test if your id file can find all portraits",
+        #"ID test (broken dont touch)": "BROKEN This will test if your id file can find all portraits",
         "Keep Order": "Preserves order of ids in the text file rather than sort by attribute color"
     }
 
@@ -54,7 +54,8 @@ def main():
     
         if label.__eq__("Portraits per row:"):  # set default value for Portraits per row
             entry.insert(i, "6")
-        if label.__eq__("Checkbox:") or label.__eq__("ID test (broken dont touch)") or label.__eq__("Keep Order"):  # add checkbox with default unchecked false
+        if label.__eq__("Checkbox:") or label.__eq__("Keep Order"):  # add checkbox with default unchecked false
+            # or label.__eq__("ID test (broken dont touch)") | Removed
             var = tk.BooleanVar()
             var.set(False)
             checkbox = tk.Checkbutton(root, variable=var)
@@ -138,7 +139,7 @@ def main():
     def on_submit(parameters, status):
         #set args used in PaDBox Generator code
         #order: "Id File Path:", "Portraits Directory:", "Portraits per row:", "ID test (broken dont touch)", "Keep Order"
-        PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4])
+        PaDBoxImageGenerator.setArgs(parameters[0], parameters[1], parameters[2], False, parameters[3])
         #check if all required parameters are filled and then otherwise call the image generation.
         if(check_input(parameters, status)):
             #begin PaDBox image gen helper function.
